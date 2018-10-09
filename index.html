@@ -121,6 +121,7 @@
       shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, 'uSampler')
       // KODE BARU
       shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, 'aVertexNormal')
+      gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute)
       shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, 'uNMatrix')
       shaderProgram.useLightingUniform = gl.getUniformLocation(shaderProgram, 'uUseLighting')
       shaderProgram.ambientColorUniform = gl.getUniformLocation(shaderProgram, 'uAmbientColor')
