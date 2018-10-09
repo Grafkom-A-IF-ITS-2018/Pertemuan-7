@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <title>Pertemuan 6</title>
+  <title>Pertemuan 7</title>
   <meta http-equiv="content-type" content="text/html" charset="ISO-8859-1">
 
   <script type="text/javascript" src="gl-matrix-min.js"></script>
@@ -272,6 +272,14 @@
     var z = -5
     var scale = 1
     var zSkew = 0
+    var xPos = 0
+    var yPos = 0.4
+    var zPos = 0
+    var pitch = 0
+    var yaw = 0
+    var pitchRate = 0
+    var yawRate = 0
+    var speed = 0
     var currentPressedKeys = {}
 
     function handleKeyDown(event) {
@@ -329,6 +337,36 @@
         // Bawah
         xSpeed += 1
       }
+      // PITCHING
+      if (currentPressedKeys[73]) {
+        // I
+        pitchRate = 0.1;
+      } else if (currentPressedKeys[75]) {
+        // K
+        pitchRate = -0.1;
+      } else {
+        pitchRate = 0;
+      }
+      // YAWING
+      if (currentPressedKeys[74]) {
+        // J
+        yawRate = 0.1;
+      } else if (currentPressedKeys[76]) {
+        // L
+        yawRate = -0.1;
+      } else {
+        yawRate = 0;
+      }
+      // FORWARD BACKWARD
+      if (currentPressedKeys[84]) {
+        // T
+        speed = 0.003;
+      } else if (currentPressedKeys[71]) {
+        // G
+        speed = -0.003;
+      } else {
+        speed = 0;
+      }
     }
 
     var filter = 0
@@ -340,6 +378,11 @@
       mat4.perspective(pMatrix, glMatrix.toRadian(45), gl.viewportWidth / gl.viewportHeight, 0.1, 100.0)
 
       mat4.identity(mvMatrix)
+
+      // Camera Motion
+      mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(-pitch), [1, 0, 0])
+      mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(-yaw), [0, 1, 0])
+      mat4.translate(mvMatrix, mvMatrix, [-xPos, -yPos, -zPos]);
 
       // PENGGANTI mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, z])
       var translationMatrix = mat4.create()
@@ -377,12 +420,23 @@
     }
 
     var lastTime = 0
+    var joggingAngle = 0
     function animate() {
       var timeNow = new Date().getTime()
       if (lastTime != 0) {
         var elapsed = timeNow - lastTime
         xRot += (xSpeed * elapsed) / 1000.0;
         yRot += (ySpeed * elapsed) / 1000.0;
+        // CAMERA MOTION
+        if (speed != 0) {
+          xPos -= Math.sin(glMatrix.toRadian(yaw)) * speed * elapsed;
+          zPos -= Math.cos(glMatrix.toRadian(yaw)) * speed * elapsed;
+
+          joggingAngle += elapsed * 0.6;  // 0.6 "fiddle factor" -- makes it feel more realistic :-)
+          yPos = Math.sin(glMatrix.toRadian(joggingAngle)) / 20 + 0.4
+        }
+        yaw += yawRate * elapsed;
+        pitch += pitchRate * elapsed;
       }
       lastTime = timeNow
     }
